@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maryory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: pink;
+      font-family: 'Fredoka One', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      color: white;
+      font-size: 6vw;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-top: 50px;
+    }
+
+    .block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .block span {
+      font-size: 5vw;
+      margin: 10px 0;
+    }
+
+    .label {
+      font-size: 4vw;
+      color: white;
+      margin-top: 10px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 4vw;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff66b2;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff4da6;
+    }
+
+    #next-btn {
+      display: none;
+      margin-top: 20px;
+      font-size: 5vw;
+      color: white;
+      background-color: #ff66b2;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 30px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+
+    #next-btn:hover {
+      background-color: #ff4da6;
+      transform: scale(1.05);
+    }
+
+    #message-container, #thanks-container, #popup-container {
+      display: none;
+      text-align: center;
+    }
+
+    #message-container h2, #message-container h3,
+    #thanks-container h2, #thanks-container h3,
+    #popup-container p {
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    #message-container h2, #thanks-container h2 {
+      font-size: 6vw;
+      color: white;
+    }
+
+    #message-container h3, #thanks-container h3 {
+      font-size: 5vw;
+      color: #ff66b2;
+      text-shadow: 3px 3px 10px rgba(255, 102, 178, 0.5);
+    }
+
+    #popup-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      display: none;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 50px 0;
+      background-color: rgba(255, 192, 203, 0.9);
+    }
+
+    #popup {
+      width: 80%;
+      max-width: 600px;
+      background-color: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      transform: scale(0);
+      animation: pop 0.5s forwards;
+      font-family: 'Fredoka One', Arial, sans-serif;
+      text-align: center;
+    }
+
+    #popup p {
+      font-size: 4vw;
+      color: black;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    #popup-btn {
+      margin-top: 20px;
+      font-size: 4vw;
+      padding: 10px 20px;
+      background-color: #ff66b2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #popup-btn:hover {
+      background-color: #ff4da6;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>¿Recuerdas cuándo fue?</h1>
+  <div class="container">
+    <div class="block">
+      <button onclick="adjustValue('day', 1)">▲</button>
+      <span id="day">1</span>
+      <button onclick="adjustValue('day', -1)">▼</button>
+      <div class="label">Día</div>
+    </div>
+    <div class="block">
+      <button onclick="adjustValue('month', 1)">▲</button>
+      <span id="month">Ene</span>
+      <button onclick="adjustValue('month', -1)">▼</button>
+      <div class="label">Mes</div>
+    </div>
+    <div class="block">
+      <button onclick="adjustValue('year', 1)">▲</button>
+      <span id="year">2024</span>
+      <button onclick="adjustValue('year', -1)">▼</button>
+      <div class="label">Año</div>
+    </div>
+  </div>
+  <button id="next-btn" onclick="goToNext()">Siguiente</button>
+
+  <script>
+    let day = 1;
+    let monthIndex = 0;
+    let year = 2024;
+
+    const months = [
+      "Ene", "Febr", "Marz", "Abrl", "May",
+      "Jun", "Jul", "Agos", "Sept", "Oct",
+      "Nov", "Dic"
+    ];
+
+    function adjustValue(type, change) {
+      if (type === 'day') {
+        day = Math.min(30, Math.max(1, day + change));
+        document.getElementById('day').textContent = day;
+      } else if (type === 'month') {
+        monthIndex = (monthIndex + change + 12) % 12;
+        document.getElementById('month').textContent = months[monthIndex];
+      } else if (type === 'year') {
+        year = Math.min(2025, Math.max(2023, year + change));
+        document.getElementById('year').textContent = year;
+      }
+      checkDate();
+    }
+
+    function checkDate() {
+      const nextBtn = document.getElementById('next-btn');
+      if (day === 6 && monthIndex === 8 && year === 2024) {
+        nextBtn.style.display = 'block';
+      } else {
+        nextBtn.style.display = 'none';
+      }
+    }
+
+    function goToNext() {
+      document.body.innerHTML = '<div id="message-container"><h2 id="love-text">Te amo mucho</h2><h3 id="name-text">Maryory</h3></div>';
+      const messageContainer = document.getElementById("message-container");
+      const loveText = document.getElementById("love-text");
+      const nameText = document.getElementById("name-text");
+
+      messageContainer.style.display = "block";
+
+      setTimeout(() => {
+        loveText.style.opacity = 1;
+        nameText.style.opacity = 1;
+      }, 1000);
+
+      setTimeout(() => {
+        loveText.style.opacity = 0;
+        nameText.style.opacity = 0;
+      }, 2500);
+
+      setTimeout(() => {
+        messageContainer.style.display = "none";
+        document.body.innerHTML = '<div id="thanks-container"><h2 id="thanks-text">Gracias por estos</h2><h3 id="months-text">4 meses</h3></div>';
+        const thanksContainer = document.getElementById("thanks-container");
+        const thanksText = document.getElementById("thanks-text");
+        const monthsText = document.getElementById("months-text");
+
+        thanksContainer.style.display = "block";
+
+        setTimeout(() => {
+          thanksText.style.opacity = 1;
+          monthsText.style.opacity = 1;
+        }, 1000);
+
+        setTimeout(() => {
+          thanksText.style.opacity = 0;
+          monthsText.style.opacity = 0;
+        }, 2500);
+
+        setTimeout(() => {
+          thanksContainer.style.display = "none";
+          document.body.innerHTML = `<div id="popup-container"><div id="popup"><p>Holaa.<br><br>Primero, quiero disculparme por no haberte enviado esto hace 10 días. Ese día no te dije nada, y tampoco pude expresarte lo importante que eres para mí. Durante estos 4 meses a tu lado he sido muy feliz la mayoría del tiempo. Sé que hemos tenido algunos problemas y que mis actitudes han llegado a molestarte, pero, a pesar de todo, te quiero igual o incluso más que antes.<br><br>Extraño ir al colegio, los extraño a todos, pero sobre todo a ti xd, y mucho más en las noches o cuando estoy solo y recuerdo lo que pasamos tú y yo, hace un año no hubiera siquiera pensado en estar con alguien, al conocernos mejor y compartir más cosas juntos y como te fui viendo poco a poco de otra manera, recuerdo en algún punto del año que dejé de hablarte porque pensé que era lo mejor en ese entonces, pero en tu ausencia me di cuenta lo mucho que significas en mi vida, sigo sintiendo lo mismo ahora, mis sentimientos por ti no han cambiado xd, quizás tú ya no me quieras como antes, probablemente por la distancia o por alguna otra razón, pero para mí sigues siendo la mejor chica que pude conocer. Sé que tal vez esperabas una relación distinta, tal vez más cariñosa o afectiva, que yo sea más maduro en mis decisiones con respecto a ti, por eso te pido perdón por todas la veces en las que te decepcioné, yo no soy de expresarme muy seguido, nunca antes había escrito una carta para alguien, escribirte es mi manera de expresarte todo lo que siento y que a veces no soy capaz de decírtelo en persona, la verdad sí quisiera mejorar y espero que con el tiempo lo pueda hacer, no te digo que no te fallaré o que soy distinto al resto, no soy perfecto, acepto que muchas veces soy muy inseguro, a veces siento que me engañarás o que pasará algo malo entre nosotros, no lo digo porque desconfíe de ti, o porque seas una mala persona, soy así y muchas veces no tengo una razón. <br><br>Muchas gracias por estos 4 meses xdd, he sido muy feliz, es muy bonito conocer a una persona que me ponga nervioso, me haga sentir extraño, que me haga decir tonterías, de verdad nunca me sentí así, el estar feliz casi todo el tiempo si estamos bien, el cariño, amor y esos momentos que pasamos nadie me los dio, y muchas veces me alegraste el día con solo hablar contigo, el recibir un mensaje tuyo o cualquier cosa, lo eres todo para mí, una persona maravillosa, sincera, una gran amiga y para mí la chica más hermosa de todas xd. Quisiera que esto dure mucho más, aunque ahora sea mucho más difícil porque nuestros caminos se irán separando, pero te prometo que daré todo de mí para que esto funcione y que no pase nada malo entre nosotros. <br><br>Por último, perdona si te abruma recibir algo tan largo, pero quería decirte todo esto. Te amo muchísimo ♡.</p><button id="popup-btn">Xd</button></div></div>`;
+          const popupContainer = document.getElementById("popup-container");
+          const popup = document.getElementById("popup");
+
+          popupContainer.style.display = "flex";
+
+          setTimeout(() => {
+            popup.style.transform = "scale(1)";
+            popup.querySelector('p').style.opacity = 1;
+          }, 100);
+
+          document.getElementById("popup-btn").onclick = function() {
+            alert("Te amo Mucho Maryory ♡");
+          };
+        }, 3500);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
